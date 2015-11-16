@@ -111,7 +111,9 @@
           g_target.removeClass('active');
           if (g_modify && $('#img-section .img-selection').length != 0) {
             saveXML(g_target.html());
-            g_target.addClass('list-group-item-success');
+            g_target.removeClass('list-group-item-warning');
+            if ( !$(g_target.target).hasClass('list-group-item-success'))
+              g_target.addClass('list-group-item-success');
           } else if (g_modify && $('#img-section .img-selection').length == 0) {
             var xmlPath = g_dir.toString() + '/' + g_target.html().substring(0, g_target.html().lastIndexOf('.')) + '.xml';
             var fs = require('fs');

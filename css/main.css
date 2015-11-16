@@ -6,6 +6,12 @@
     margin-bottom: 15px;
 }
 
+#fileLists{
+    max-height: 400px;
+    overflow: auto;
+    overflow-x:hidden
+}
+
 .list-group-item{
    padding: 5px 10px;
 }
