@@ -55,13 +55,13 @@
         <button class="btn btn-default" id="open"><span class="glyphicon glyphicon-folder-open"></span> Open Directory
         </button>
         <button class="btn btn-default" id="reload"><span class="glyphicon glyphicon-refresh"></span> Reload</button>
-        <button class="btn btn-default"><span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+        <button class="btn btn-default" id="backward"><span class="glyphicon glyphicon-fast-backward"></span>
         </button>
-        <button class="btn btn-default"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <button class="btn btn-default" id="leftward"><span class="glyphicon glyphicon-chevron-left"></span>
         </button>
-        <button class="btn btn-default"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <button class="btn btn-default" id="rightward"><span class="glyphicon glyphicon-chevron-right"></span>
         </button>
-        <button class="btn btn-default"><span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+        <button class="btn btn-default" id="forward"><span class="glyphicon glyphicon-fast-forward"></span>
         </button>
       </div>
       <div class="list-group" id="fileLists">
@@ -112,7 +112,7 @@
           if (g_modify && $('#img-section .img-selection').length != 0) {
             saveXML(g_target.html());
             g_target.removeClass('list-group-item-warning');
-            if ( !$(g_target.target).hasClass('list-group-item-success'))
+            if (!$(g_target.target).hasClass('list-group-item-success'))
               g_target.addClass('list-group-item-success');
           } else if (g_modify && $('#img-section .img-selection').length == 0) {
             var xmlPath = g_dir.toString() + '/' + g_target.html().substring(0, g_target.html().lastIndexOf('.')) + '.xml';
@@ -121,6 +121,7 @@
               //if (err) throw err;
               if (!err) console.log('successfully deleted ' + xmlPath);
             });
+            g_target.removeClass('list-group-item-success');
             g_target.addClass('list-group-item-warning');
           }
         }
@@ -128,7 +129,7 @@
         $('#text-dialog').hide();
         $('#img')[0].src = g_dir + '/' + $(e.target).html();
         if ($(e.target).hasClass('list-group-item-success')) {
-          $('#img').load(function(){
+          $('#img').load(function () {
             readXML($(e.target).html());
             $('#img').unbind('load');
           });
@@ -195,7 +196,8 @@
       flag = false;
       $('#selection-text').val('');
       $('#diff-check').get(0).checked = false;
-      $('#class-sel').prop('selectedIndex', 0);;
+      $('#class-sel').prop('selectedIndex', 0);
+      ;
       $('#selection-text').trigger('change');
       $('#diff-check').trigger('change');
       $('#class-sel').trigger('change');
@@ -220,6 +222,22 @@
       if (flag) return;
       g_div = this;
       showTextDialog();
+    });
+
+    $('#backward').click(function () {
+      $('#fileLists a:first-child').click();
+    });
+
+    $('#forward').click(function () {
+      $('#fileLists a:last-child').click();
+    });
+
+    $('#leftward').click(function () {
+      $('#fileLists a.active').prev().click();
+    });
+
+    $('#rightward').click(function () {
+      $('#fileLists a.active').next().click();
     });
 
   });
@@ -312,7 +330,7 @@
     var xml = builder.buildObject(obj);
     fs.writeFile(xmlURL, xml, function (err) {
       if (err) throw err;
-      console.log('It\'s saved!');
+      console.log(xmlURL + 'is saved!');
     });
   }
 
