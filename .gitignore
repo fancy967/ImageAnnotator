@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
-img/
 node_modules/
 npm-debug.log
+images/
+build.txt
