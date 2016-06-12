@@ -3,6 +3,7 @@
 var g_imgFolderPath = null;
 var g_curListItem = null;
 var g_curDIV = null;
+var g_newlyDIV = null;
 var g_marksXML = null;
 var g_classesArr = null;
 var g_bndBoxCnt = 0;
@@ -10,6 +11,7 @@ var g_zoom = 100;
 var g_zoomInWidth = true;
 var g_fileList = null;
 var ignoreScrollEvents = false;
+
 
 const NEEDCONFIRM = false;
 const IMG_EXTENSIONS = ['jpeg', 'jpg', 'png'];
@@ -72,6 +74,16 @@ $(document).ready(function () {
 
   $(document).keydown(function (event) {
     switch (event.keyCode) {
+      case 13: //Enter
+        if ($('#modal_del_confirm').hasClass('in') && NEEDCONFIRM) {
+          $('#btn_del_confirm').click();
+        } else if ($('#div_toolkit').is(":visible") && $('#ul_classes_list').is(":visible")) {
+          $('#div_toolkit .dropdown-toggle').dropdown('toggle');
+        }
+        if ($('#div_toolkit .dropdown-toggle').is(':focus')) {
+          return false;
+        }
+        break;
       case 27:
         if ($('#modal_del_confirm').hasClass('in'))
           $('#modal_del_confirm').modal('hide');
@@ -103,14 +115,10 @@ $(document).ready(function () {
           $('#modal_del_confirm').modal('show');
         }
         break;
-      case 13: //Enter
-        if ($('#modal_del_confirm').hasClass('in') && NEEDCONFIRM) {
+      case 90: //Ctrl + Z
+        if (event.ctrlKey && g_newlyDIV){
+          $(g_newlyDIV).click();
           $('#btn_del_confirm').click();
-        } else if ($('#div_toolkit').is(":visible") && $('#ul_classes_list').is(":visible")) {
-          $('#div_toolkit .dropdown-toggle').dropdown('toggle');
-        }
-        if ($('#div_toolkit .dropdown-toggle').is(':focus')) {
-          return false;
         }
         break;
     }
@@ -282,6 +290,7 @@ $(document).ready(function () {
       if (!$(e.target).hasClass('active'))
         $(e.target).addClass('active');
       g_curListItem = $(e.target);
+      g_newlyDIV = null;
       // if ($('#div_files_list').scrollTop() > $('#div_files_list a.active').position().top ||
       //   $('#div_files_list').scrollTop() + $('#div_files_list').height() <
       //   $('#div_files_list a.active').position().top + $('#div_files_list a.active').outerHeight()) {
@@ -464,8 +473,8 @@ $(document).ready(function () {
     }
     var x, y;
     if (isNaN(e.offsetX)) {
-      x = $(g_curDIV).outerWidth() * 0.5 + $(g_curDIV).position().left;
-      y = $(g_curDIV).outerHeight() * 0.5 + $(g_curDIV).position().top;
+      x = $('#div_container').scrollLeft() + $(g_curDIV).outerWidth() * 0.5 + $(g_curDIV).position().left;
+      y = $('#div_container').scrollTop() + $(g_curDIV).outerHeight() * 0.5 + $(g_curDIV).position().top;
     } else {
       x = e.offsetX + e.target.offsetLeft + parseInt($(e.target).css('borderLeftWidth'), 10);
       y = e.offsetY + e.target.offsetTop + parseInt($(e.target).css('borderTopWidth'), 10);
@@ -571,6 +580,7 @@ $(document).ready(function () {
       return;
     }
     g_curDIV = cDiv;
+    g_newlyDIV = g_curDIV;
     cDiv = null;
 
     $('#input_text').val('');
@@ -605,10 +615,10 @@ $(document).ready(function () {
       difficult: '0',
       text: [$(g_curDIV).attr('data-text')],
       bndbox: [{
-        xmin: Math.round($(g_curDIV).position().left * ratio),
-        ymin: Math.round($(g_curDIV).position().top * ratio),
-        xmax: Math.round(($(g_curDIV).position().left + $(g_curDIV).outerWidth()) * ratio),
-        ymax: Math.round(($(g_curDIV).position().top + $(g_curDIV).outerHeight()) * ratio)
+        xmin: Math.round(($('#div_container').scrollLeft() + $(g_curDIV).position().left) * ratio),
+        ymin: Math.round(($('#div_container').scrollTop() + $(g_curDIV).position().top) * ratio),
+        xmax: Math.round(($('#div_container').scrollLeft() + $(g_curDIV).position().left + $(g_curDIV).outerWidth()) * ratio),
+        ymax: Math.round(($('#div_container').scrollTop() + $(g_curDIV).position().top + $(g_curDIV).outerHeight()) * ratio)
       }]
     };
     g_marksXML.object.push(node);
@@ -783,7 +793,7 @@ function generateBoundingBox(alsoGenerateMarksList) {
       if (alsoGenerateMarksList) {
         $('#div_marks_list').append('<div class="btn-group">' +
           '<button type="button" bndbox="bndbox-' + g_bndBoxCnt + '" class="btn btn-default btn-sm active">'
-          + node.text + '</button><button type="button" bndbox="bndbox-' + g_bndBoxCnt +
+          + (node.text == '' ? 'Null' : node.text)  + '</button><button type="button" bndbox="bndbox-' + g_bndBoxCnt +
           '" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modal_del_confirm">X</button></div>');
       }
     });
